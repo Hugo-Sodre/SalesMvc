@@ -1,9 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SalesMvc.Data;
+using Microsoft.Extensions.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
+
+// Altere "MySqlServerVersion" para a versão correta do seu servidor MySQL
+var mySqlServerVersion = new MySqlServerVersion(new Version(8, 0, 22)); // Exemplo da versão 8.0.22
+
 builder.Services.AddDbContext<SalesMvcContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SalesMvcContext") ?? throw new InvalidOperationException("Connection string 'SalesMvcContext' not found.")));
+    options.UseMySql(configuration.GetConnectionString("SalesMvcContext"), mySqlServerVersion, builder =>
+        builder.MigrationsAssembly("SalesMvc")));
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
